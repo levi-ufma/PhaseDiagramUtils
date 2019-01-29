@@ -55,7 +55,7 @@ class PhaseDiagramOpenAnalyzer:
             return []
 
         potential = [v for el, v in gcpdobj.chempots.items()]
-        phases = ", ".join([entry.name for entry in gcpdobj.stable_entries])
+        phases = [entry.name for entry in gcpdobj.stable_entries]
         return [phases, potential[0]]
 
     def get_phase_diagram_data(self):
@@ -94,3 +94,9 @@ class PhaseDiagramOpenAnalyzer:
 
             # Data to plot phase diagram
             return toplot
+
+
+if __name__ == "__main__":
+    pd = PhaseDiagramOpenAnalyzer(system=["Sn", "Mn", "W", "O"], open_element="O")
+    # Shows data
+    print(pd.get_phase_diagram_data())
