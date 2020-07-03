@@ -5,6 +5,10 @@ import settings
 from thermodynamics import Thermodynamics
 from pymatgen import MPRester, Element
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram, PDPlotter
+from pymatgen.ext.matproj import MPRester
+from pymatgen.apps.borg.hive import VaspToComputedEntryDrone
+from pymatgen.apps.borg.queen import BorgQueen
+from pymatgen.entries.compatibility import MaterialsProjectCompatibility
 
 
 class PhaseDiagramOpenAnalyzer:
@@ -68,11 +72,25 @@ class PhaseDiagramOpenAnalyzer:
         """
         open_elements_specific = None
         open_element_all = Element(self.open_element)
-        mpr = MPRester("settings")
+        mpr = MPRester("sMnWB7h8Lf4NKmzo")
+
+        # import do dados dos arquivos tipo vasp
+        drone = VaspToComputedEntryDrone()
+        queen = BorgQueen(drone, rootpath=".")
+        entries = queen.get_data()
 
         # Get data to make phase diagram
-        entries = mpr.get_entries_in_chemsys(self.system, compatible_only=True)
-       #print(entries)
+        mp_entries = mpr.get_entries_in_chemsys(self.system, compatible_only=True)
+
+        entries.extend(mp_entries)
+
+        compat = MaterialsProjectCompatibility()
+        entries = compat.process_entries(entries)
+        #explanation_output = open("explain.txt",'w')
+        entries_output = open("entries.txt",'w')
+        compat.explain(entries[0])
+        print(entries, file=entries_output)
+        #print(entries)
 
         if open_elements_specific:
             gcpd = GrandPotentialPhaseDiagram(entries, open_elements_specific)

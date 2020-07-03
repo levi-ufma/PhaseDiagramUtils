@@ -1,23 +1,54 @@
 from PhaseDiagramOpen import PhaseDiagramOpenAnalyzer
 from pymatgen import MPRester, Element
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram, PDPlotter
+from pymatgen.apps.borg.hive import VaspToComputedEntryDrone
+from pymatgen.apps.borg.queen import BorgQueen
+from pymatgen.entries.compatibility import MaterialsProjectCompatibility
 
 
-pd = PhaseDiagramOpenAnalyzer(system=["Mg", "P","O"], open_element="O")
-all_phase_diagrams = pd.get_phase_diagram_data()
+
+
+#pd = pd2.get_phase_diagram_data()
+
+
 # ler o tamanho da lista
-number_of_phase_diagrams = len(all_phase_diagrams)
+
 
 # cria uma lista só com os potenciais químicos
 # chempot_list = [all_phase_diagrams[pd_index][1] for pd_index in range(number_of_phase_diagrams)]
+
+
+drone = VaspToComputedEntryDrone()
+queen = BorgQueen(drone, rootpath=".")
+entries = queen.get_data()
+
+
+pd2 = PhaseDiagram(entries)
+
+all_phase_diagrams = pd.get_phase_diagram_data()
+
+number_of_phase_diagrams = len(all_phase_diagrams)
 
 open_elements_specific = None
 open_element_all = Element("O")
 mpr = MPRester("sMnWB7h8Lf4NKmzo")
 
-entries = mpr.get_entries_in_chemsys(['Mg','P','O'], compatible_only=True)
+mp_entries = mpr.get_entries_in_chemsys(['Li','Ca','O'], compatible_only=True)
 
-pd2 = PhaseDiagram(entries)
+pd = PhaseDiagramOpenAnalyzer(mp_entries[0], open_element_all)
+
+entries.extend(mp_entries)
+
+# Process entries using the MaterialsProjectCompatibility
+compat = MaterialsProjectCompatibility()
+entries = compat.process_entries(entries)
+#explanation_output = open("explain.txt",'w')
+entries_output = open("entries.txt",'w')
+compat.explain(entries[0])
+#print(entries, file=entries_output)
+
+
+# pd2 = PhaseDiagram(entries)
 
 chempot_list = pd2.get_transition_chempots(open_element_all)
 pd_index = 0
@@ -40,7 +71,7 @@ for particular_phase_diagram in all_phase_diagrams:
         if phase in chempot_range_of_each_phase.keys():
             # Retorna uma cópia do dicionário
             chempot_range_of_each_phase[phase][1] = next_chempot.copy()
-            
+            # print(chempot_range_of_each_phase[phase][1])
         else:
             # retorna a fase e o intervalo dos potenciais
             chempot_range_of_each_phase[phase] = chempot_range.copy() 
