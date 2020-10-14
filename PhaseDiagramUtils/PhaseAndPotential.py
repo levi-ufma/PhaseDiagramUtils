@@ -31,7 +31,7 @@ number_of_phase_diagrams = len(all_phase_diagrams)
 
 open_elements_specific = None
 open_element_all = Element("O")
-mpr = MPRester("sMnWB7h8Lf4NKmzo")
+mpr = MPRester("######")
 
 mp_entries = mpr.get_entries_in_chemsys(['Li','Ca','O'], compatible_only=True)
 
