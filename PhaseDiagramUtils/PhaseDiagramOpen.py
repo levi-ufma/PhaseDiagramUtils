@@ -72,7 +72,7 @@ class PhaseDiagramOpenAnalyzer:
         """
         open_elements_specific = None
         open_element_all = Element(self.open_element)
-        mpr = MPRester("sMnWB7h8Lf4NKmzo")
+        mpr = MPRester("key")
 
         # import do dados dos arquivos tipo vasp
         drone = VaspToComputedEntryDrone()
